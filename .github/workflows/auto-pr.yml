@@ -1,0 +1,37 @@
+name: Automatizacion PR MLOPS
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  crear-pull-request:
+    runs-on: ubuntu-latest
+
+    if: contains(github.event.head_commit.message, 'MLOPS')
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Crear Pull Request automáticamente
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Commit detectado:"
+          echo "${{ github.event.head_commit.message }}"
+
+          echo "Creando Pull Request..."
+
+          gh pr create \
+            --base main \
+            --head "${{ github.ref_name }}" \
+            --title "PR automático - MLOPS" \
+            --body "Pull Request generado automáticamente mediante GitHub Actions porque el mensaje del commit contiene la palabra MLOPS."
